@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Pexip Conference</string>
+    <string name="node_hint">Conferencing Node domain or IP</string>
+    <string name="vmr_hint">Virtual Meeting Room name</string>
+    <string name="display_name_hint">Your name</string>
+    <string name="pin_hint">PIN</string>
+    <string name="join">Join</string>
+    <string name="grant_media_permissions">"You should grant permission for Microphone and Camera."</string>
+    <string name="conference_not_found">Conference %1$s not found.</string>
+    <string name="cannot_connect">Cannot connect to %1$s.</string>
+    <string name="enter">Enter</string>
+    <string name="pin">PIN</string>
+    <string name="wrong_pin">Wrong PIN!</string>
+    <string name="screen_capturing_title">Screen Capturing</string>
+    <string name="screen_capturing_text">Pexip Conference is capturing the screen.</string>
+</resources>
