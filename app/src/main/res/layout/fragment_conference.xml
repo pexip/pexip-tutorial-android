@@ -37,6 +37,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- TODO (06) Add the goneUnless binding adapter to hide the selfview when muted -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/local_video_card"
                 android:layout_width="150dp"
@@ -60,6 +61,10 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
+
+                <!-- TODO (07) Add the button to mute the audio -->
+
+                <!-- TODO (08) Add the button to mute the video -->
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/hang_up_button"

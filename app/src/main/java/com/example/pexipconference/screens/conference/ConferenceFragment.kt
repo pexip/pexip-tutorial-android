@@ -88,6 +88,7 @@ class ConferenceFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        // TODO (05) Check if it is on mute before start capturing
         viewModel.localVideoTrack.value?.startCapture()
     }
 

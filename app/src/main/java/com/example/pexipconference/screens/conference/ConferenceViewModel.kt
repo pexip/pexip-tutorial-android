@@ -51,6 +51,9 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     val onError: LiveData<Throwable>
         get() = _onError
 
+    // TODO (01) Add LiveData to indicate when audio is muted
+    // TODO (02) Add LiveData to indicate when video is muted
+
     // Objects needed to initialize the conference
     private val webRtcMediaConnectionFactory: WebRtcMediaConnectionFactory
 
@@ -99,6 +102,9 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
             startWebRTCConnection(conference, audioTrack, videoTrack)
         }
     }
+
+    // TODO (03) Define the onToggleMuteAudio() that is the method that the button will trigger
+    // TODO (04) Define the onToggleMuteVideo() that is the method that the button will trigger
 
     fun onDisconnect() {
         _isConnected.value = false
