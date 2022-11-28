@@ -1,45 +1,158 @@
 package com.example.pexipconference.screens.conference
 
+import android.Manifest
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 
 import com.example.pexipconference.R
+import com.example.pexipconference.databinding.FragmentConferenceBinding
+import com.google.android.material.snackbar.Snackbar
+import com.pexip.sdk.api.infinity.NoSuchConferenceException
+import org.webrtc.RendererCommon
 
 class ConferenceFragment : Fragment() {
 
-    // TODO (27) Define the private variable to store the binding and viewModel
+    private lateinit var binding: FragmentConferenceBinding
+    private lateinit var viewModel: ConferenceViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // TODO (28) Remove the way the layout is inflated. We will use data binding
-        return inflater.inflate(R.layout.fragment_conference, container, false)
-        // TODO (29) Retrieve the safeArgs
-        // TODO (30) Set the action bar title with the VMR name
-        // TODO (31) Inflate the layout
-        // TODO (32) Instanciate the viewModel
-        // TODO (33) Initialialize the video surfaces
-        // TODO (34) Set observers
-        // TODO (35) Check the media permissions
-        // TODO (36) Start the conference
+
+        // This variable has the node, vmr and displayName
+        val args by navArgs<ConferenceFragmentArgs>()
+
+        // Change the Action Bar title and put the Virtual Meeting Room
+        (activity as AppCompatActivity).supportActionBar?.title = args.vmr
+
+        // Inflate the layout for this fragment
+        binding = FragmentConferenceBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+
+        // Create an instance of the viewModel and attach it to the data binding
+        val application = requireNotNull(this.activity).application
+        val viewModelFactory = ConferenceViewModelFactory(application)
+        viewModel = ViewModelProvider(this, viewModelFactory)[ConferenceViewModel::class.java]
+        binding.viewModel = viewModel
+
+        // Assign this fragment as lifecycle owner
+        binding.lifecycleOwner = this
+
+        // Initialize the containers for the videoTracks
+        initializeVideoSurfaces()
+
+        // Set all observers
+        setVideoObservers()
+        setConnectionObservers(args.node, args.vmr, args.displayName)
+
+        if (viewModel.isConnected.value != true) {
+            // Check the media permissions or show a pop-up to accept them
+            checkMediaPermissions() {
+                // Callback once the permission was correctly checked
+                viewModel.startConference(args.node, args.vmr, args.displayName)
+            }
+
+        }
+
+        return binding.root
+
     }
 
-    // TODO (37) Override onDestroyView() to release the video surfaces
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.localVideoTrack.value?.removeRenderer(binding.localVideoSurface)
+        binding.localVideoSurface.release()
+        viewModel.remoteVideoTrack.value?.removeRenderer(binding.mainVideoSurface)
+        binding.mainVideoSurface.release()
+    }
 
-    // TODO (38) Override onStop() to stop capturing the local video
+    override fun onStop() {
+        super.onStop()
+        viewModel.localVideoTrack.value?.stopCapture()
+    }
 
-    // TODO (39) Override onStart() to start capturing the local video
+    override fun onStart() {
+        super.onStart()
+        viewModel.localVideoTrack.value?.startCapture()
+    }
 
-    // TODO (40) Define the private method initializeVideoSurfaces
+    private fun initializeVideoSurfaces() {
+        // Mirror the local video
+        binding.localVideoSurface.setMirror(true)
 
-    // TODO (41) Define the private method setVideoObservers
+        // Show all the video inside the container
+        binding.mainVideoSurface.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
 
-    // TODO (42) Define the private method setConnectionObservers
+        // Initialize the video surfaces
+        binding.localVideoSurface.init(viewModel.eglBase.eglBaseContext, null)
+        binding.mainVideoSurface.init(viewModel.eglBase.eglBaseContext, null)
+    }
 
-    // TODO (43) Define the private method checkMediaPermissions
+    private fun setVideoObservers() {
+        // Initialize observer to attach the VideoTrack to the surface renderers
+        viewModel.localVideoTrack.observe(viewLifecycleOwner, Observer { videoTrack ->
+            videoTrack.addRenderer(binding.localVideoSurface)
+        })
+        viewModel.remoteVideoTrack.observe(viewLifecycleOwner, Observer { videoTrack ->
+            videoTrack.addRenderer(binding.mainVideoSurface)
+        })
+    }
+
+    private fun setConnectionObservers(node: String, vmr: String, displayName: String) {
+        // Initialize observer to display connectivity changes
+        viewModel.isConnected.observe(viewLifecycleOwner, Observer { isConnected ->
+            if (!isConnected) {
+                // The conference finished
+                findNavController().popBackStack()
+            }
+        })
+
+        // Error detected. Display a Snackbar with it.
+        viewModel.onError.observe(viewLifecycleOwner, Observer { exception ->
+            val error = when (exception) {
+                is NoSuchConferenceException -> {
+                    resources.getString(R.string.conference_not_found, vmr)
+                }
+                else -> {
+                    resources.getString(R.string.cannot_connect, node)
+                }
+            }
+            val parentView = requireActivity().findViewById<View>(android.R.id.content)
+            Snackbar.make(parentView, error, Snackbar.LENGTH_LONG).show()
+            findNavController().popBackStack()
+        })
+    }
+
+    private fun checkMediaPermissions(callback: () -> Unit) {
+        val requestMultiplePermissions =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                if (!permissions.entries.all { it.value }) {
+                    val parentView = requireActivity().findViewById<View>(android.R.id.content)
+                    Snackbar.make(parentView, R.string.grant_media_permissions, Snackbar.LENGTH_LONG).show()
+                    findNavController().popBackStack()
+                } else {
+                    callback()
+                }
+            }
+        requestMultiplePermissions.launch(
+            arrayOf(
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.CAMERA
+            )
+        )
+    }
 
 }

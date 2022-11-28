@@ -9,7 +9,28 @@
         android:name="com.example.pexipconference.screens.form.FormFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_form">
-        <!-- TODO (01) Add action to ConferenceFragment with some animations -->
+        <action
+            android:id="@+id/action_formFragment_to_conferenceFragment"
+            app:destination="@id/conferenceFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/formFragment" />
     </fragment>
-    <!-- TODO (02) Add the ConferenceFragment that should receive three arguments: node, vmr and display_name -->
+    <fragment
+        android:id="@+id/conferenceFragment"
+        android:name="com.example.pexipconference.screens.conference.ConferenceFragment"
+        android:label=""
+        tools:layout="@layout/fragment_conference">
+        <argument
+            android:name="node"
+            app:argType="string" />
+        <argument
+            android:name="vmr"
+            app:argType="string" />
+        <argument
+            android:name="display_name"
+            app:argType="string" />
+    </fragment>
 </navigation>

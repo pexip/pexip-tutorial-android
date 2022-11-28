@@ -5,7 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.pexipconference.R
+import androidx.navigation.fragment.findNavController
+import com.example.pexipconference.databinding.FragmentFormBinding
 
 class FormFragment : Fragment() {
 
@@ -13,9 +14,20 @@ class FormFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // TODO (09) Change the way the layout is inflated and use data binding
-        return inflater.inflate(R.layout.fragment_form, container, false)
-        // TODO (10) Define button listener to navigate to the Conference with all the parameters
+        // Inflate the layout for this fragment
+        val binding = FragmentFormBinding.inflate(inflater, container, false)
+        binding.joinButton.setOnClickListener {
+
+            val node = binding.nodeText.editText?.text.toString()
+            val vmr = binding.vmrText.editText?.text.toString()
+            val displayName = binding.displayNameText.editText?.text.toString()
+
+            val action = FormFragmentDirections.actionFormFragmentToConferenceFragment(
+                node, vmr, displayName
+            )
+            findNavController().navigate(action)
+        }
+        return binding.root
     }
 
 }
