@@ -32,8 +32,35 @@
         <argument
             android:name="display_name"
             app:argType="string" />
-        <!-- TODO (01) Add the argument for the pin -->
-        <!-- TODO (02) Add the action to navigate to the PinFragment -->
+        <argument
+            android:name="pin"
+            app:argType="string"
+            app:nullable="true"/>
+        <action
+            android:id="@+id/action_conferenceFragment_to_pinFragment"
+            app:destination="@id/pinFragment"
+            app:enterAnim="@anim/slide_in_top"
+            app:exitAnim="@anim/slide_out_top"
+            app:popUpTo="@id/formFragment" />
     </fragment>
-    <!-- TODO (03) Add the information for the PinFragment with the arguments and the action-->
+    <fragment
+        android:id="@+id/pinFragment"
+        android:name="com.example.pexipconference.screens.pin.PinFragment"
+        android:label="Introduce PIN"
+        tools:layout="@layout/fragment_pin">
+        <argument
+            android:name="node"
+            app:argType="string" />
+        <argument
+            android:name="vmr"
+            app:argType="string" />
+        <argument
+            android:name="display_name"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_pinFragment_to_conferenceFragment"
+            app:destination="@id/conferenceFragment"
+            app:exitAnim="@anim/slide_out_top"
+            app:popUpTo="@id/formFragment" />
+    </fragment>
 </navigation>

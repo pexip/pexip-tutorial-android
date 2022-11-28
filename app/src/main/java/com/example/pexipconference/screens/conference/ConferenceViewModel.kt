@@ -81,16 +81,14 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         localVideoTrack.value?.dispose()
     }
 
-    // TODO (11) Add the PIN to the startConference() parameters
-    fun startConference(node: String, vmr: String, displayName: String) {
+    fun startConference(node: String, vmr: String, displayName: String, pin: String?) {
         val exceptionHandler = CoroutineExceptionHandler { _, exception ->
             // Convert the error into a more descriptive message
             _onError.postValue(exception)
         }
         viewModelScope.launch(exceptionHandler) {
             // Authenticate to the conference
-            // TODO (12) Add the PIN to the createConference() call
-            conference = createConference(node, vmr, displayName)
+            conference = createConference(node, vmr, displayName, pin)
 
             // Get access to the local microphone and camera
             val (audioTrack, videoTrack) = getLocalMedia()
@@ -106,11 +104,11 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         _isConnected.value = false
     }
 
-    // TODO (13) Add the PIN to the method input parameters
     private suspend fun createConference(
         node: String,
         vmr: String,
-        displayName: String
+        displayName: String,
+        pin: String?
     ): InfinityConference {
 
         val okHttpClient = OkHttpClient()
@@ -120,11 +118,17 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         val nodeUrl = URL("https://${node}")
 
         return withContext(Dispatchers.IO) {
-            // TODO (14) Set different requests depending on if we are using PIN or not
-            val response = infinityService.newRequest(nodeUrl)
-                .conference(vmr)
-                .requestToken(request)
-                .await()
+            val response = if (pin != null) {
+                infinityService.newRequest(nodeUrl)
+                    .conference(vmr)
+                    .requestToken(request, pin)
+                    .await()
+            } else {
+                infinityService.newRequest(nodeUrl)
+                    .conference(vmr)
+                    .requestToken(request)
+                    .await()
+            }
             conference = InfinityConference.create(
                 service = infinityService,
                 node = nodeUrl,

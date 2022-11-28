@@ -2,11 +2,34 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".screens.pin.PinFragment">
-    <!-- TODO (04) Remove the TextView with the "Hello PIN" message -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello PIN"></TextView>
-    <!-- TODO (05) Add two Linearlayouts one inside the other -->
-    <!-- TODO (06) Insert an EditTExt and a Button in the inner LinearLayout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/pin_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:ems="10"
+                android:hint="@string/pin"
+                android:inputType="number" />
+
+            <Button
+                android:id="@+id/enter_pin_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="60dp"
+                android:text="@string/enter" />
+        </LinearLayout>
+
+    </LinearLayout>
 </layout>

@@ -5,7 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.pexipconference.R
+import com.example.pexipconference.databinding.FragmentPinBinding
 
 class PinFragment : Fragment() {
 
@@ -13,10 +16,23 @@ class PinFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // TODO (07) Change the way the layout is inflated and use data binding
-        return inflater.inflate(R.layout.fragment_pin, container, false)
-        // TODO (08) Read the safe args
-        // TODO (09) Set the click listener to navigate to the conference with the new PIN
+
+        // Inflate the layout for this fragment
+        val binding = FragmentPinBinding.inflate(
+            inflater,
+            container,
+            false
+        )
+
+        val args by navArgs<PinFragmentArgs>()
+        binding.enterPinButton.setOnClickListener {
+            val action = PinFragmentDirections.actionPinFragmentToConferenceFragment(
+                args.node, args.vmr, args.displayName, binding.pinText.text.toString()
+            )
+            findNavController().navigate(action)
+        }
+        return binding.root
+
     }
 
 }
