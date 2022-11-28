@@ -51,8 +51,15 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     val onError: LiveData<Throwable>
         get() = _onError
 
-    // TODO (01) Add LiveData to indicate when audio is muted
-    // TODO (02) Add LiveData to indicate when video is muted
+    // Notify whether the local audio is muted or not
+    private val _isLocalAudioMuted = MutableLiveData<Boolean>()
+    val isLocalAudioMuted: LiveData<Boolean>
+        get() = _isLocalAudioMuted
+
+    // Notify whether the local video is muted or not
+    private val _isLocalVideoMuted = MutableLiveData<Boolean>()
+    val isLocalVideoMuted: LiveData<Boolean>
+        get() = _isLocalVideoMuted
 
     // Objects needed to initialize the conference
     private val webRtcMediaConnectionFactory: WebRtcMediaConnectionFactory
@@ -103,8 +110,25 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    // TODO (03) Define the onToggleMuteAudio() that is the method that the button will trigger
-    // TODO (04) Define the onToggleMuteVideo() that is the method that the button will trigger
+    fun onToggleMuteAudio() {
+        if (_isLocalAudioMuted.value != true) {
+            localAudioTrack.stopCapture()
+            _isLocalAudioMuted.value = true
+        } else {
+            localAudioTrack.startCapture()
+            _isLocalAudioMuted.value = false
+        }
+    }
+
+    fun onToggleMuteVideo() {
+        if (_isLocalVideoMuted.value != true) {
+            localVideoTrack.value?.stopCapture()
+            _isLocalVideoMuted.value = true
+        } else {
+            localVideoTrack.value?.startCapture()
+            _isLocalVideoMuted.value = false
+        }
+    }
 
     fun onDisconnect() {
         _isConnected.value = false

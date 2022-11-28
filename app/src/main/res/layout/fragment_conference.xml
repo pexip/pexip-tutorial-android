@@ -37,7 +37,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- TODO (06) Add the goneUnless binding adapter to hide the selfview when muted -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/local_video_card"
                 android:layout_width="150dp"
@@ -45,6 +44,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="0dp"
+                app:goneUnless="@{!viewModel.isLocalVideoMuted}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -62,9 +62,33 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
-                <!-- TODO (07) Add the button to mute the audio -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/mute_audio_button"
+                    android:layout_width="60dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="4dp"
+                    android:backgroundTint="@color/teal"
+                    android:onClick="@{() -> viewModel.onToggleMuteAudio()}"
+                    app:audioMuted="@{viewModel.isLocalAudioMuted}"
+                    app:cornerRadius="100dp"
+                    app:enabled="@{viewModel.isLocalAudioMuted}"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="30dp" />
 
-                <!-- TODO (08) Add the button to mute the video -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/mute_video_button"
+                    android:layout_width="60dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="4dp"
+                    android:backgroundTint="@color/teal"
+                    android:onClick="@{() -> viewModel.onToggleMuteVideo()}"
+                    app:cornerRadius="100dp"
+                    app:enabled="@{viewModel.isLocalVideoMuted}"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="30dp"
+                    app:videoMuted="@{viewModel.isLocalVideoMuted}" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/hang_up_button"
