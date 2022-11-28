@@ -113,7 +113,9 @@ class ConferenceFragment : Fragment() {
         viewModel.remoteVideoTrack.observe(viewLifecycleOwner, Observer { videoTrack ->
             videoTrack.addRenderer(binding.mainVideoSurface)
         })
-        // TODO (03) Observe when the backCamera is active and mirror the selfview surface
+        viewModel.isBackCamera.observe(viewLifecycleOwner, Observer {
+            binding.localVideoSurface.setMirror(!it)
+        })
     }
 
     private fun setConnectionObservers(node: String, vmr: String, displayName: String) {

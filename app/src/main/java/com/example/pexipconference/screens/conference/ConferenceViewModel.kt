@@ -61,7 +61,10 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     val isLocalVideoMuted: LiveData<Boolean>
         get() = _isLocalVideoMuted
 
-    // TODO (01) Add LiveData to indicate when backCamera is active
+    // Notify whether the back camera is select or the front camera
+    private val _isBackCamera = MutableLiveData<Boolean>()
+    val isBackCamera: LiveData<Boolean>
+        get() = _isBackCamera
 
     // Objects needed to initialize the conference
     private val webRtcMediaConnectionFactory: WebRtcMediaConnectionFactory
@@ -132,7 +135,15 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    // TODO (02) Define the onToggleCamera() that is the method that the button will trigger
+    fun onToggleCamera() {
+        val callback = object : CameraVideoTrack.SwitchCameraCallback {
+            override fun onFailure(error: String) {}
+            override fun onSuccess(front: Boolean) {
+                _isBackCamera.value = !front
+            }
+        }
+        _localVideoTrack.value?.switchCamera(callback)
+    }
 
     fun onDisconnect() {
         _isConnected.value = false

@@ -90,7 +90,19 @@
                     app:iconSize="30dp"
                     app:videoMuted="@{viewModel.isLocalVideoMuted}" />
 
-                <!-- TODO (04) Add the button to change the camera -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/change_camera_button"
+                    android:layout_width="60dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="4dp"
+                    android:backgroundTint="@color/teal"
+                    android:onClick="@{() -> viewModel.onToggleCamera()}"
+                    app:cornerRadius="100dp"
+                    app:enabled="@{viewModel.isBackCamera}"
+                    app:icon="@drawable/camera_switch"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="30dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/hang_up_button"
