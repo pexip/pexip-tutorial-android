@@ -3,9 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".screens.form.FormFragment">
 
+    <!-- TODO (03) Remove the TextView with the "Hello Form" message -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello Form"></TextView>
+
+    <!-- TODO (04) Add a LinearLayout with vertical orientation -->
+    <!-- TODO (05) Inside the LinearLayout insert a TextInput for the node -->
+    <!-- TODO (06) Inside the LinearLayout insert a TextInput for the VMR -->
+    <!-- TODO (07) Inside the LinearLayout insert a TextInput for the display_name -->
+    <!-- TODO (08) Inside the LinearLayout insert a Button to send the form -->
 
 </layout>

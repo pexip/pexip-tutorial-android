@@ -10,9 +10,15 @@
             type="com.example.pexipconference.screens.conference.ConferenceViewModel" />
     </data>
 
+    <!-- TODO (22) Remove the TextView with the "Hello Form" message -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello Conference"></TextView>
+
+    <!-- TODO (23) Define a ConstraintLayout -->
+    <!-- TODO (24) Inside the ConstraintLayout define a ProgressBar and another ConstraintLayout -->
+    <!-- TODO (25) Define a SurfaceViewRenderer (mainVideo) and a CardView with other SurfaceViewRenderer (selfView) -->
+    <!-- TODO (26) Define a LinearLayout that will be our toolbar with a button for hang up -->
 
 </layout>

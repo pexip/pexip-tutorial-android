@@ -13,7 +13,9 @@ class FormFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // TODO (09) Change the way the layout is inflated and use data binding
         return inflater.inflate(R.layout.fragment_form, container, false)
+        // TODO (10) Define button listener to navigate to the Conference with all the parameters
     }
 
 }
