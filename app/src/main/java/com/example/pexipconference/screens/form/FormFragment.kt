@@ -22,6 +22,7 @@ class FormFragment : Fragment() {
             val vmr = binding.vmrText.editText?.text.toString()
             val displayName = binding.displayNameText.editText?.text.toString()
 
+            // TODO (10) Add the PIN to the call. In this case, it will be null
             val action = FormFragmentDirections.actionFormFragmentToConferenceFragment(
                 node, vmr, displayName
             )

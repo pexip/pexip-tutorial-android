@@ -62,6 +62,7 @@ class ConferenceFragment : Fragment() {
             // Check the media permissions or show a pop-up to accept them
             checkMediaPermissions() {
                 // Callback once the permission was correctly checked
+                // TODO (15) Pass the PIN to startConference()
                 viewModel.startConference(args.node, args.vmr, args.displayName)
             }
 
@@ -123,6 +124,8 @@ class ConferenceFragment : Fragment() {
         // Error detected. Display a Snackbar with it.
         viewModel.onError.observe(viewLifecycleOwner, Observer { exception ->
             val error = when (exception) {
+                // TODO (16) Navigate to the PinFragment in case RequiredPinException received
+                // TODO (17) Detect InvalidPinException and show a custom message
                 is NoSuchConferenceException -> {
                     resources.getString(R.string.conference_not_found, vmr)
                 }
@@ -130,6 +133,7 @@ class ConferenceFragment : Fragment() {
                     resources.getString(R.string.cannot_connect, node)
                 }
             }
+            // TODO (18) Check if error is not empty and run the following code
             val parentView = requireActivity().findViewById<View>(android.R.id.content)
             Snackbar.make(parentView, error, Snackbar.LENGTH_LONG).show()
             findNavController().popBackStack()

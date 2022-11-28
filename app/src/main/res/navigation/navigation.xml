@@ -32,5 +32,8 @@
         <argument
             android:name="display_name"
             app:argType="string" />
+        <!-- TODO (01) Add the argument for the pin -->
+        <!-- TODO (02) Add the action to navigate to the PinFragment -->
     </fragment>
+    <!-- TODO (03) Add the information for the PinFragment with the arguments and the action-->
 </navigation>

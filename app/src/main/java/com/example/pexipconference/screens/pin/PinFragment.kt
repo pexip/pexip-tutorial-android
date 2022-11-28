@@ -13,7 +13,10 @@ class PinFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // TODO (07) Change the way the layout is inflated and use data binding
         return inflater.inflate(R.layout.fragment_pin, container, false)
+        // TODO (08) Read the safe args
+        // TODO (09) Set the click listener to navigate to the conference with the new PIN
     }
 
 }
