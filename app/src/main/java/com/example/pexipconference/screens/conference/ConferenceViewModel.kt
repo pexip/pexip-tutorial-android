@@ -61,6 +61,8 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     val isLocalVideoMuted: LiveData<Boolean>
         get() = _isLocalVideoMuted
 
+    // TODO (01) Add LiveData to indicate when backCamera is active
+
     // Objects needed to initialize the conference
     private val webRtcMediaConnectionFactory: WebRtcMediaConnectionFactory
 
@@ -129,6 +131,8 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
             _isLocalVideoMuted.value = false
         }
     }
+
+    // TODO (02) Define the onToggleCamera() that is the method that the button will trigger
 
     fun onDisconnect() {
         _isConnected.value = false

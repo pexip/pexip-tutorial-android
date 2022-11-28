@@ -90,6 +90,8 @@
                     app:iconSize="30dp"
                     app:videoMuted="@{viewModel.isLocalVideoMuted}" />
 
+                <!-- TODO (04) Add the button to change the camera -->
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/hang_up_button"
                     android:layout_width="60dp"
