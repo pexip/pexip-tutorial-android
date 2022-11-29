@@ -179,6 +179,11 @@ class ConferenceFragment : Fragment() {
                 viewModel.presentationVideoTrack.value?.addRenderer(binding.secondaryVideoSurface)
             }
         })
+
+        // TODO (09) Register the screen share activity to obtain the launcher
+        // TODO (10) Define the connection object that will manage the service
+        // TODO (11) Observer the isSharingScreen LiveData and bind/unbind the service
+
     }
 
     private fun cleanMainSurface() {

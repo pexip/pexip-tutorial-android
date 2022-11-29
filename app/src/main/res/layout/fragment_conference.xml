@@ -121,6 +121,8 @@
                     app:iconPadding="0dp"
                     app:iconSize="30dp" />
 
+                <!-- TODO (08) Add the button to share the screen -->
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/hang_up_button"
                     android:layout_width="60dp"

@@ -78,6 +78,8 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     val isPresentationInMain: LiveData<Boolean>
         get() = _isPresentationInMain
 
+    // TODO (04) Define LiveData for isSharingScreen
+
     // Objects needed to initialize the conference
     private val webRtcMediaConnectionFactory: WebRtcMediaConnectionFactory
 
@@ -156,6 +158,8 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         }
         _localVideoTrack.value?.switchCamera(callback)
     }
+
+    // TODO (05) Define public method onToggleShareScreen
 
     fun onDisconnect() {
         _isConnected.value = false
@@ -272,5 +276,9 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         // Start the media connection.
         mediaConnection.start()
     }
+
+    // TODO (06) Define startScreenShare()
+
+    // TODO (07) Define stopScreenShare()
 
 }
