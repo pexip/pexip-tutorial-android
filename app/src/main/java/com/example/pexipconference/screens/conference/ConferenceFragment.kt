@@ -59,7 +59,7 @@ class ConferenceFragment : Fragment() {
         // Set all observers
         setVideoObservers()
         setConnectionObservers(args.node, args.vmr, args.displayName)
-        // TODO (09) Add a call to setPresentationObservers()
+        setPresentationObservers()
 
         if (viewModel.isConnected.value != true) {
             // Check the media permissions or show a pop-up to accept them
@@ -80,7 +80,8 @@ class ConferenceFragment : Fragment() {
         binding.localVideoSurface.release()
         viewModel.remoteVideoTrack.value?.removeRenderer(binding.mainVideoSurface)
         binding.mainVideoSurface.release()
-        // TODO (14) Release the secondaryVideoSurface
+        viewModel.presentationVideoTrack.value?.removeRenderer(binding.secondaryVideoSurface)
+        binding.secondaryVideoSurface.release()
     }
 
     override fun onStop() {
@@ -105,7 +106,7 @@ class ConferenceFragment : Fragment() {
         // Initialize the video surfaces
         binding.localVideoSurface.init(viewModel.eglBase.eglBaseContext, null)
         binding.mainVideoSurface.init(viewModel.eglBase.eglBaseContext, null)
-        // TODO (13) Initialize the secondaryVideoSurface
+        binding.secondaryVideoSurface.init(viewModel.eglBase.eglBaseContext, null)
     }
 
     private fun setVideoObservers() {
@@ -158,11 +159,39 @@ class ConferenceFragment : Fragment() {
         })
     }
 
-    // TODO (10) Define the private method setPresentationObservers to observer presentationVideoTrack and isPresentationInMain
+    private fun setPresentationObservers() {
+        viewModel.presentationVideoTrack.observe(viewLifecycleOwner, Observer { videoTrack ->
+            if (videoTrack != null) {
+                cleanMainSurface()
+                cleanSecondarySurface()
+                viewModel.remoteVideoTrack.value?.addRenderer(binding.secondaryVideoSurface)
+                videoTrack?.addRenderer(binding.mainVideoSurface)
+            }
+        })
+        viewModel.isPresentationInMain.observe(viewLifecycleOwner, Observer { presentationInMain ->
+            cleanMainSurface()
+            cleanSecondarySurface()
+            if (presentationInMain) {
+                viewModel.remoteVideoTrack.value?.addRenderer(binding.secondaryVideoSurface)
+                viewModel.presentationVideoTrack.value?.addRenderer(binding.mainVideoSurface)
+            } else {
+                viewModel.remoteVideoTrack.value?.addRenderer(binding.mainVideoSurface)
+                viewModel.presentationVideoTrack.value?.addRenderer(binding.secondaryVideoSurface)
+            }
+        })
+    }
 
-    // TODO (11) Define the private method cleanMainSurface
+    private fun cleanMainSurface() {
+        viewModel.remoteVideoTrack.value?.removeRenderer(binding.mainVideoSurface)
+        viewModel.presentationVideoTrack.value?.removeRenderer(binding.mainVideoSurface)
+        binding.mainVideoSurface.clearImage()
+    }
 
-    // TODO (12) Define the private method cleanSecondarySurface
+    private fun cleanSecondarySurface() {
+        viewModel.remoteVideoTrack.value?.removeRenderer(binding.secondaryVideoSurface)
+        viewModel.presentationVideoTrack.value?.removeRenderer(binding.secondaryVideoSurface)
+        binding.secondaryVideoSurface.clearImage()
+    }
 
     private fun checkMediaPermissions(callback: () -> Unit) {
         val requestMultiplePermissions =

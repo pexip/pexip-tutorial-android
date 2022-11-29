@@ -12,6 +12,8 @@ import com.pexip.sdk.api.infinity.InfinityService
 import com.pexip.sdk.api.infinity.RequestTokenRequest
 import com.pexip.sdk.conference.ConferenceEventListener
 import com.pexip.sdk.conference.DisconnectConferenceEvent
+import com.pexip.sdk.conference.PresentationStartConferenceEvent
+import com.pexip.sdk.conference.PresentationStopConferenceEvent
 import com.pexip.sdk.conference.infinity.InfinityConference
 import com.pexip.sdk.media.*
 import com.pexip.sdk.media.webrtc.WebRtcMediaConnectionFactory
@@ -66,9 +68,15 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     val isBackCamera: LiveData<Boolean>
         get() = _isBackCamera
 
-    // TODO (01) Define LiveData for presentationVideoTrack
+    // Presentation VideoTrack
+    private val _presentationVideoTrack = MutableLiveData<VideoTrack?>()
+    val presentationVideoTrack: LiveData<VideoTrack?>
+        get() = _presentationVideoTrack
 
-    // TODO (06) Define LiveData for when the presentation is in main view
+    // Presentation in main region
+    private val _isPresentationInMain = MutableLiveData<Boolean>()
+    val isPresentationInMain: LiveData<Boolean>
+        get() = _isPresentationInMain
 
     // Objects needed to initialize the conference
     private val webRtcMediaConnectionFactory: WebRtcMediaConnectionFactory
@@ -153,7 +161,9 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         _isConnected.value = false
     }
 
-    // TODO (07) Define the public method onSwapMainSecondaryVideos to change the video in main
+    fun onSwapMainSecondaryVideos() {
+        _isPresentationInMain.value = _isPresentationInMain.value != true
+    }
 
     private suspend fun createConference(
         node: String,
@@ -197,8 +207,15 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
                 is DisconnectConferenceEvent -> {
                     _isConnected.postValue(false)
                 }
-                // TODO (04) Listen to the event PresentationStartConferenceEvent
-                // TODO (05) Listen to the event PresentationStopConferenceEvent
+                is PresentationStartConferenceEvent -> {
+                    mediaConnection.startPresentationReceive()
+                    _isPresentationInMain.postValue(true)
+                }
+                is PresentationStopConferenceEvent -> {
+                    mediaConnection.stopPresentationReceive()
+                    _isPresentationInMain.postValue(false)
+                    _presentationVideoTrack.postValue(null)
+                }
                 else -> {
                     Log.d("ConferenceViewModel", event.toString())
                 }
@@ -245,8 +262,12 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         // Attach the callback to the media connection.
         mediaConnection.registerMainRemoteVideoTrackListener(mainRemoveVideTrackListener)
 
-        // TODO (02) Define the callback method for new presentation
-        // TODO (03) Attach the callback to media connection
+        // Define a callback method for when the presentation is received
+        val presentationVideoTrackListener = MediaConnection.RemoteVideoTrackListener { videoTrack ->
+            _presentationVideoTrack.postValue(videoTrack)
+        }
+        // Attach the callback to the media connection
+        mediaConnection.registerPresentationRemoteVideoTrackListener(presentationVideoTrackListener)
 
         // Start the media connection.
         mediaConnection.start()
