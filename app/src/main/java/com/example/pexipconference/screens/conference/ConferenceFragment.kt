@@ -1,13 +1,21 @@
 package com.example.pexipconference.screens.conference
 
 import android.Manifest
+import android.app.Activity.RESULT_OK
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.media.projection.MediaProjectionManager
 import android.os.Bundle
+import android.os.IBinder
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -180,10 +188,35 @@ class ConferenceFragment : Fragment() {
             }
         })
 
-        // TODO (09) Register the screen share activity to obtain the launcher
-        // TODO (10) Define the connection object that will manage the service
-        // TODO (11) Observer the isSharingScreen LiveData and bind/unbind the service
+        // Register the activity with the callback and obtain the launcher
+        val screenSharingLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (it.resultCode == RESULT_OK) {
+                viewModel.startScreenShare(it.data!!)
+            }
+        }
 
+        // Define the connection object that will manage the service state
+        val screenSharingServiceConnection = object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                val mediaProjectionManager =
+                    getSystemService(requireContext(), MediaProjectionManager::class.java)!!
+                screenSharingLauncher.launch(mediaProjectionManager.createScreenCaptureIntent())
+            }
+            override fun onServiceDisconnected(name: ComponentName?) {}
+        }
+
+        // Observe the isSharingScreen LiveData and bind/unbind the service base on the value
+        viewModel.isSharingScreen.observe(viewLifecycleOwner, Observer {
+            val intent = Intent(context, ScreenSharingService::class.java)
+            if (it == true) {
+                context?.bindService(intent, screenSharingServiceConnection, Context.BIND_AUTO_CREATE)
+            } else {
+                viewModel.stopScreenShare()
+                context?.unbindService(screenSharingServiceConnection)
+            }
+        })
     }
 
     private fun cleanMainSurface() {

@@ -1,6 +1,8 @@
 package com.example.pexipconference.screens.conference
 
 import android.app.Application
+import android.content.Intent
+import android.media.projection.MediaProjection
 import android.util.Log
 
 import androidx.lifecycle.AndroidViewModel
@@ -78,7 +80,10 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     val isPresentationInMain: LiveData<Boolean>
         get() = _isPresentationInMain
 
-    // TODO (04) Define LiveData for isSharingScreen
+    // Notify whether is sharing or not
+    private val _isSharingScreen = MutableLiveData<Boolean>()
+    val isSharingScreen: LiveData<Boolean>
+        get() = _isSharingScreen
 
     // Objects needed to initialize the conference
     private val webRtcMediaConnectionFactory: WebRtcMediaConnectionFactory
@@ -159,7 +164,9 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         _localVideoTrack.value?.switchCamera(callback)
     }
 
-    // TODO (05) Define public method onToggleShareScreen
+    fun onToggleShareScreen() {
+        _isSharingScreen.value = _isSharingScreen.value != true
+    }
 
     fun onDisconnect() {
         _isConnected.value = false
@@ -277,8 +284,25 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         mediaConnection.start()
     }
 
-    // TODO (06) Define startScreenShare()
+    // The fragment will call this method for obtaining the video track
+    fun startScreenShare(intent: Intent) {
+        val callback = object : MediaProjection.Callback() {
+            override fun onStop() {}
+        }
+        val presentationVideoTrack =
+            webRtcMediaConnectionFactory.createMediaProjectionVideoTrack(intent, callback)
+        presentationVideoTrack.startCapture(QualityProfile.High)
+        mediaConnection.setPresentationVideoTrack(presentationVideoTrack)
+        _presentationVideoTrack.value = presentationVideoTrack
+        _isPresentationInMain.value = false
+    }
 
-    // TODO (07) Define stopScreenShare()
+    // The fragment will call this method to stop the screen sharing
+    fun stopScreenShare() {
+        (presentationVideoTrack.value as LocalVideoTrack).stopCapture()
+        mediaConnection.setPresentationVideoTrack(null)
+        _presentationVideoTrack.value = null
+        _isPresentationInMain.value = false
+    }
 
 }
