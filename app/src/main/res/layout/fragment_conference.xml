@@ -54,6 +54,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center" />
             </androidx.cardview.widget.CardView>
+            <!-- TODO (08) Add a CardView with a SurfaceViewRedenrer with the secondary video -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

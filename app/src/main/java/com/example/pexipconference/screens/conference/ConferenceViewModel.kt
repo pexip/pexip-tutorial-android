@@ -66,6 +66,10 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     val isBackCamera: LiveData<Boolean>
         get() = _isBackCamera
 
+    // TODO (01) Define LiveData for presentationVideoTrack
+
+    // TODO (06) Define LiveData for when the presentation is in main view
+
     // Objects needed to initialize the conference
     private val webRtcMediaConnectionFactory: WebRtcMediaConnectionFactory
 
@@ -149,6 +153,8 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         _isConnected.value = false
     }
 
+    // TODO (07) Define the public method onSwapMainSecondaryVideos to change the video in main
+
     private suspend fun createConference(
         node: String,
         vmr: String,
@@ -191,6 +197,8 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
                 is DisconnectConferenceEvent -> {
                     _isConnected.postValue(false)
                 }
+                // TODO (04) Listen to the event PresentationStartConferenceEvent
+                // TODO (05) Listen to the event PresentationStopConferenceEvent
                 else -> {
                     Log.d("ConferenceViewModel", event.toString())
                 }
@@ -236,6 +244,9 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
 
         // Attach the callback to the media connection.
         mediaConnection.registerMainRemoteVideoTrackListener(mainRemoveVideTrackListener)
+
+        // TODO (02) Define the callback method for new presentation
+        // TODO (03) Attach the callback to media connection
 
         // Start the media connection.
         mediaConnection.start()

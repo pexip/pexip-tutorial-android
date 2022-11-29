@@ -59,6 +59,7 @@ class ConferenceFragment : Fragment() {
         // Set all observers
         setVideoObservers()
         setConnectionObservers(args.node, args.vmr, args.displayName)
+        // TODO (09) Add a call to setPresentationObservers()
 
         if (viewModel.isConnected.value != true) {
             // Check the media permissions or show a pop-up to accept them
@@ -79,6 +80,7 @@ class ConferenceFragment : Fragment() {
         binding.localVideoSurface.release()
         viewModel.remoteVideoTrack.value?.removeRenderer(binding.mainVideoSurface)
         binding.mainVideoSurface.release()
+        // TODO (14) Release the secondaryVideoSurface
     }
 
     override fun onStop() {
@@ -103,6 +105,7 @@ class ConferenceFragment : Fragment() {
         // Initialize the video surfaces
         binding.localVideoSurface.init(viewModel.eglBase.eglBaseContext, null)
         binding.mainVideoSurface.init(viewModel.eglBase.eglBaseContext, null)
+        // TODO (13) Initialize the secondaryVideoSurface
     }
 
     private fun setVideoObservers() {
@@ -154,6 +157,12 @@ class ConferenceFragment : Fragment() {
             }
         })
     }
+
+    // TODO (10) Define the private method setPresentationObservers to observer presentationVideoTrack and isPresentationInMain
+
+    // TODO (11) Define the private method cleanMainSurface
+
+    // TODO (12) Define the private method cleanSecondarySurface
 
     private fun checkMediaPermissions(callback: () -> Unit) {
         val requestMultiplePermissions =
