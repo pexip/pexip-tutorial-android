@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Intent
 import android.media.projection.MediaProjection
 import android.util.Log
-
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,7 +11,6 @@ import androidx.lifecycle.viewModelScope
 import com.pexip.sdk.api.coroutines.await
 import com.pexip.sdk.api.infinity.InfinityService
 import com.pexip.sdk.api.infinity.RequestTokenRequest
-import com.pexip.sdk.conference.ConferenceEventListener
 import com.pexip.sdk.conference.DisconnectConferenceEvent
 import com.pexip.sdk.conference.PresentationStartConferenceEvent
 import com.pexip.sdk.conference.PresentationStopConferenceEvent
@@ -95,10 +93,9 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     init {
         // Create the webRtcMediaConnectionFactory
         WebRtcMediaConnectionFactory.initialize(application)
-        webRtcMediaConnectionFactory = WebRtcMediaConnectionFactory(
-            context = application,
-            eglBase = eglBase
-        )
+        webRtcMediaConnectionFactory = WebRtcMediaConnectionFactory.Builder(application)
+            .eglBase(eglBase)
+            .build()
     }
 
     override fun onCleared() {
@@ -156,9 +153,16 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
 
     fun onToggleCamera() {
         val callback = object : CameraVideoTrack.SwitchCameraCallback {
-            override fun onFailure(error: String) {}
+
+            override fun onFailure(error: String) {
+            }
+
+            @Deprecated("Use onSuccess that contains deviceName as an argument.")
             override fun onSuccess(front: Boolean) {
-                _isBackCamera.value = !front
+            }
+
+            override fun onSuccess(deviceName: String) {
+                _isBackCamera.value = webRtcMediaConnectionFactory.isFrontFacing(deviceName)
             }
         }
         _localVideoTrack.value?.switchCamera(callback)
@@ -180,7 +184,7 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         node: String,
         vmr: String,
         displayName: String,
-        pin: String?
+        pin: String?,
     ): InfinityConference {
 
         val okHttpClient = OkHttpClient()
@@ -213,17 +217,17 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun configureConferenceListeners(conference: InfinityConference) {
-        conference.registerConferenceEventListener(ConferenceEventListener { event ->
+        conference.registerConferenceEventListener { event ->
             when (event) {
                 is DisconnectConferenceEvent -> {
                     _isConnected.postValue(false)
                 }
                 is PresentationStartConferenceEvent -> {
-                    mediaConnection.startPresentationReceive()
+                    mediaConnection.setPresentationRemoteVideoTrackEnabled(true)
                     _isPresentationInMain.postValue(true)
                 }
                 is PresentationStopConferenceEvent -> {
-                    mediaConnection.stopPresentationReceive()
+                    mediaConnection.setPresentationRemoteVideoTrackEnabled(false)
                     _isPresentationInMain.postValue(false)
                     _presentationVideoTrack.postValue(null)
                 }
@@ -231,7 +235,7 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
                     Log.d("ConferenceViewModel", event.toString())
                 }
             }
-        })
+        }
     }
 
     private fun getLocalMedia(): Pair<LocalAudioTrack, CameraVideoTrack> {
@@ -245,7 +249,7 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
     private fun startWebRTCConnection(
         conference: InfinityConference,
         localAudioTrack: LocalAudioTrack,
-        localVideoTrack: CameraVideoTrack
+        localVideoTrack: CameraVideoTrack,
     ) {
         // Define the STUN server. This is used for obtain the public IP of the participants
         // and this way be able to establish the media connection.
@@ -262,6 +266,8 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         // Attach the local media streams to the media connection.
         mediaConnection.setMainAudioTrack(localAudioTrack)
         mediaConnection.setMainVideoTrack(localVideoTrack)
+        mediaConnection.setMainRemoteAudioTrackEnabled(true)
+        mediaConnection.setMainRemoteVideoTrackEnabled(true)
 
         // Define a callback method for when the remote video is received.
         val mainRemoveVideTrackListener = MediaConnection.RemoteVideoTrackListener { videoTrack ->
@@ -274,9 +280,10 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         mediaConnection.registerMainRemoteVideoTrackListener(mainRemoveVideTrackListener)
 
         // Define a callback method for when the presentation is received
-        val presentationVideoTrackListener = MediaConnection.RemoteVideoTrackListener { videoTrack ->
-            _presentationVideoTrack.postValue(videoTrack)
-        }
+        val presentationVideoTrackListener =
+            MediaConnection.RemoteVideoTrackListener { videoTrack ->
+                _presentationVideoTrack.postValue(videoTrack)
+            }
         // Attach the callback to the media connection
         mediaConnection.registerPresentationRemoteVideoTrackListener(presentationVideoTrackListener)
 
@@ -304,5 +311,4 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
         _presentationVideoTrack.value = null
         _isPresentationInMain.value = false
     }
-
 }
