@@ -162,7 +162,7 @@ class ConferenceViewModel(application: Application) : AndroidViewModel(applicati
             }
 
             override fun onSuccess(deviceName: String) {
-                _isBackCamera.value = webRtcMediaConnectionFactory.isFrontFacing(deviceName)
+                _isBackCamera.value = webRtcMediaConnectionFactory.isBackFacing(deviceName)
             }
         }
         _localVideoTrack.value?.switchCamera(callback)
